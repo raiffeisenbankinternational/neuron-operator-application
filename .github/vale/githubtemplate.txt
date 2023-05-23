@@ -1,0 +1,6 @@
+{{- range .Files}}
+{{- $p := .Path -}}
+{{- range .Alerts -}}
+{{- printf "::error file=%s,line=%d,severity=%s,title=%s::%s" $p .Line .Severity .Check .Message }}
+{{end -}}
+{{end}}

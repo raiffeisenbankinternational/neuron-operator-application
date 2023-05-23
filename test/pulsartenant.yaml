@@ -1,0 +1,13 @@
+apiVersion: neuron.isf/v1alpha1
+kind: NeuronTenant
+metadata:
+  name: rbi
+spec:
+  tenant: rbi
+  neuronClusterName: dev01
+  lifecyclePolicy: CleanUpAfterDeletion
+  settings:
+    adminRoles:         # List of auth principal allowed to administrate the tenant
+      - admin
+    allowedClusters:    # List of allowed clusters
+      - dev01

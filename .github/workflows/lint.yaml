@@ -1,0 +1,44 @@
+name: Linting
+
+on:
+  pull_request:
+    branches:
+      - main
+
+env:
+  PYLINT_VERSION: 2.14.5
+
+jobs:
+  vale:
+    runs-on: self-hosted
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Run vale-linter
+      uses: internal-marketplace/vale-linter@v1
+      with:
+        paths: "README.md,docs"
+
+  pylint:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Setup python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Install pylint
+      run: |
+        pip install pylint==${{ env.PYLINT_VERSION }}
+        pip install -r requirements.txt
+
+    - name: Run pylint
+      shell: bash
+      run: |
+        echo '::add-matcher::.github/pylint.json'
+        pylint -E operator/**/*.py
+        echo '::remove-matcher owner=pylint::'

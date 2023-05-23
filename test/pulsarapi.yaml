@@ -1,0 +1,343 @@
+apiVersion: neuron.rbi.tech/v1alpha1
+kind: NeuronAPI
+metadata:
+  name: neuron-demo
+spec:
+  stage: dev01
+  asyncAPI:
+    asyncapi: '2.3.0'
+    id: "urn:tech:rbi:neuron:demo:producer"
+    info:
+      title: Neuron demo events producer service API
+    
+      version: '0.0.1'
+      description: |
+        The Neuron "Producer" Demo is a sample service that generates various sample events (customer, transaction, exchange rate, ...). To generate these data we use the tool "[faker](https://faker.readthedocs.io/en/master/])".
+        ### Features:
+        * Produce demo events as data products in a configurable manner (publish interval's, volumes, etc.)
+      contact:
+        name: ISF Neuron
+        url: https://code.rbi.tech/raiffeisen/neuron
+        email: neuron@rbinternational.com
+        
+      license:
+        name: ISF 1.0
+        url: https://www.apache.org/licenses/LICENSE-2.0
+    
+    tags:
+      - name: Neuron
+        description: Based on ISF Neuron
+        externalDocs:
+          url: https://code.rbi.tech/raiffeisen/neuron
+    
+    servers:
+      community-test:
+        url: pulsar://neuron-pulsar-dev01.cortex-test01.cortex-test.internal.rbigroup.cloud:6650
+        protocol: pulsar
+        description: ISF community test cluster
+      community-prod:
+        url: pulsar+ssl://neuron-pulsar-prod01.cortex-prod01.cortex-prod.internal.rbigroup.cloud:6651
+        protocol: pulsar+ssl
+        description: ISF community prod cluster
+        security:
+          - jwt: []
+    
+    defaultContentType: avro
+    
+    channels:
+      rbi-demo/exchange-rate/neuron-demo-exchange-rate-v1:
+        description: The topic on which demo exchange rates for currencies are produced and consumed.
+        subscribe:
+          summary: Inform about updated demo exchange rate for a target currency in the base currency.
+          operationId: consumeExchangeRate
+          message:
+            $ref: '#/components/messages/exchangeRate'
+        servers: 
+          - community-test
+      rbi-demo/exchange-rate/neuron-demo-exchange-rate-correction-v1:
+        description: The topic on which demo exchange rate corrections for currencies are produced and consumed.
+        subscribe:
+          summary: Inform about a corrected demo exchange rate for a target currency in the base currency.
+          operationId: consumeExchangeRateCorrection
+          message:
+            $ref: '#/components/messages/exchangeRateCorrection'
+        servers: 
+          - community-test
+      rbi-demo/customer/neuron-demo-customer-v1:
+        description: The topic on which demo customers are produced and consumed.
+        subscribe:
+          summary: Inform about a new demo customer was onboarded or updated.
+          operationId: consumeDemoCustomer
+          message:
+            $ref: '#/components/messages/demoCustomer'
+        servers: 
+          - community-test
+      rbi-demo/transaction/neuron-demo-transaction-v1:
+        description: The topic on which transactions are produced and consumed.
+        subscribe:
+          summary: Recieve a new demo transaction.
+          operationId: consumeDemoPerson
+          message:
+            $ref: '#/components/messages/demoTransaction'
+        servers: 
+          - community-test
+    components:
+      messages:
+        exchangeRate:
+          name: exchangeRate
+          title: Exchange rate
+          summary: Randomly generated exchange rate for a given base- / target-currency pair.
+          contentType: avro
+          tags:
+            - name: demo
+            - name: Local data product
+          traits:
+            - $ref: "#/components/messageTraits/eventTime"
+          payload:
+            $ref: "#/components/schemas/exchangeRatePayload"
+          examples:
+            - name: EUR-USD
+              summary: USD exchange rate to base currency in EUR
+              headers:
+                eventTimestap: 1649343592
+              payload:
+                baseCurrency: EUR
+                targetCurrency: USD
+                rate: 1.1338
+            - name: EUR-NOK
+              summary: NOK exchange rate to base currency in EUR
+              headers:
+                eventTimestap: 1649343234
+              payload:
+                baseCurrency: EUR
+                targetCurrency: NOK
+                rate: 9.9578
+        exchangeRateCorrection:
+          name: exchangeRateCorrection
+          title: Exchange rate correction
+          summary: Randomly generated exchange rate correction for a given base- / target-currency pair.
+          contentType: avro
+          tags:
+            - name: demo
+            - name: Local data product        
+          traits:
+            - $ref: "#/components/messageTraits/eventTime"
+          payload:
+            $ref: "#/components/schemas/exchangeRatePayload"
+          examples:
+            - name: EUR-USD
+              summary: USD exchange rate to base currency in EUR
+              headers:
+                eventTimestap: 1649342538
+              payload:
+                baseCurrency: EUR
+                targetCurrency: USD
+                rate: 1.1334
+            - name: EUR-NOK
+              summary: AUD exchange rate to base currency in EUR
+              headers:
+                eventTimestap: 16493414440
+              payload:
+                baseCurrency: EUR
+                targetCurrency: AUD
+                rate: 1.5662
+        demoCustomer:
+          name: demoCustomer
+          title: Demo Customer
+          summary: Randomly generated demo customer
+          contentType: avro
+          tags:
+            - name: demo
+            - name: Local data product        
+          traits:
+            - $ref: "#/components/messageTraits/eventTime"
+          payload:
+            $ref: "#/components/schemas/demoCustomerPayload"
+          correlationId:
+            description: Customer ID is used as correlationId
+            location: $message.payload#/customerId        
+          examples:
+            - name: retailCustomer
+              summary: Onboarding of a retail customer
+              headers:
+                eventTime: 1649343592
+              payload:
+                customerId: 0815
+                firstName: Max
+                lastName: Mustermann
+                title: Dr.
+                placeOfBirth: Vienna
+                countryOfBirth: AT
+                dateOfBirth: "1980-11-28"
+                dateOfOpened: "2022-04-12"
+                lineOfBusiness: PI
+        demoTransaction:
+          name: demoTransaction
+          title: Demo Transaction
+          summary: Randomly generated demo transaction
+          contentType: avro
+          tags:
+            - name: demo
+            - name: Local data product        
+          traits:
+            - $ref: "#/components/messageTraits/eventTime"
+          payload:
+            $ref: "#/components/schemas/demoTransactionPayload"
+          examples:
+            - name: creditTransaction
+              summary: Onboarding of a retail customer
+              headers:
+                eventTime: 1649343132
+              payload:
+                accountCountryCode: AT
+                accountIban: 	AT611904300234573201
+                amount: 3423.25
+                creditDebitId: CREDIT
+                currencyCode: EUR
+                customerId: 0815
+                relatedAccountCountryCode: DE
+                relatedAccountIban: DE511604303245673231
+                transactionDesc: Demo Transaction
+    
+      schemas:
+        exchangeRatePayload:
+          description: This Schema is a demo schema for the Neuron demo exchange rate
+          type: object
+          required:
+            - baseCurrency
+            - targetCurrency
+            - rate
+          additionalProperties: false
+          properties:
+            baseCurrency:
+              type: string
+              description: Base currency code in ISO-4217 (default "EUR")
+              maxLength: 3
+              minLength: 3
+            targetCurrency:
+              type: string
+              description: Target currency code in ISO-4217
+              maxLength: 3
+              minLength: 3          
+            rate:
+              type: number
+              description: Exchange rate = Base currency / Target currency
+              minimum: 0
+        demoCustomerPayload:
+          description: This Schema describes a Neuron demo customer
+          type: object
+          required:
+            - customerId
+            - firstName
+            - lastName
+            - placeOfBirth
+            - countryOfBirth
+            - dateOfBirth
+            - dateOfOpened
+            - lineOfBusiness
+          additionalProperties: false
+          properties:
+            customerId:
+              type: string
+              description: Unique identifier for the customer
+            firstName:
+              type: string
+              description: First name of the customer
+            lastName:
+              type: string
+              description: Surname of the customer
+            title:
+              type: string
+              description: Title of the customer
+            placeOfBirth:
+              type: string
+              description: Place of Birth of the customer of place where the company was founded
+            countryOfBirth:
+              type: string
+              description: Country of Birth of the customer or country where the company was founded. ISO format (e.g. AT, US, IS)
+              maxLength: 3
+            dateOfBirth:
+              type: string
+              description: Date of Birth for the customer of date when the company was founded
+            dateOfOpened:
+              type: string
+              description: Date of customer registration
+            bic:
+              type: string
+              description: BIC for FI customers
+            lineOfBusiness:
+              type: string
+              description: Line of business like corporate (CORP), financial institutions (FI), small and medium enterprise (SME), private individual (PI)
+              enum:
+              - CORP
+              - FI
+              - SME
+              - PI
+        demoTransactionPayload:
+          description: This Schema describes a Neuron demo transaction
+          type: object
+          required:
+            - accountCountryCode
+            - accountIban
+            - amount
+            - creditDebitId
+            - currencyCode
+            - customerId
+            - relatedAccountCountryCode
+            - relatedAccountIban
+          additionalProperties: false
+          properties:
+            accountCountryCode:
+              type: string
+              description: Country code of the customer's account ISO format (e.g. AT, US, IS)
+              maxLength: 3
+              minLength: 3      
+            accountIban:
+              type: string
+              description: IBAN number of the customer's account
+            amount:
+              type: number
+              description: Amount of transfer
+            creditDebitId:
+              type: string
+              description: Type of transaction 'debit' or 'credit'
+              enum:
+                - DEBIT
+                - CREDIT
+            currencyCode:
+              type: string
+              description: Currency code in ISO-4217 (e.g. 'EUR', 'USD', 'ISK', ...)
+              maxLength: 3
+              minLength: 3          
+            customerId:
+              type: string
+              description: Unique identifier for the customer
+            relatedAccountCountryCode:
+              type: string
+              description: Country code of the other customer's account
+              maxLength: 3
+              minLength: 3                
+            relatedAccountIban:
+              type: string
+              description: IBAN of other customer's account
+            transactionDesc:
+              type: string
+              description: Description of transaction
+      messageTraits:
+        eventTime:
+          headers:
+            type: object
+            properties:
+              eventTime:
+                description: Timestamp in epoc when the business event occured
+                type: integer
+                minimum: 0
+                maximum: 4111892291
+      securitySchemes:
+        jwt:
+          type: oauth2
+          flows:
+            password:
+              tokenUrl: https://idp.rbinternational.com/as/token.oauth2
+              scopes:
+                sub: Roles to authorize for Neuron pub/sub

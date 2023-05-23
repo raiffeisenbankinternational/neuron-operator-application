@@ -1,0 +1,41 @@
+---
+apiVersion: neuron.isf/v1alpha1
+kind: NeuronNamespace
+metadata:
+  name: transaction
+spec:
+  tenant: rbi         # The tenant the namespace belongs to
+  namespace: transaction
+  neuronClusterName: dev01
+  lifecyclePolicy: CleanUpAfterDeletion
+  rolePermissions:
+    MY-PRODUCER:
+      - produce
+    MY-CONSUMER:
+      - consume
+  # Pulsar REST API policies in camelCase
+  policies:
+    schemaValidationEnforced: true
+    isAllowAutoUpdateSchema: false
+    schemaCompatibilityStrategy: FORWARD_TRANSITIVE
+    schemaAutoUpdateCompatibilityStrategy: ForwardTransitive
+    maxSubscriptionsPerTopic: 10
+    maxConsumersPerTopic: 10
+    maxProducersPerTopic: 10
+    maxConsumersPerSubscription: 10
+    retentionPolicies:
+      retentionSizeInMB: 2048
+      retentionTimeInMinutes: 3600
+    replicationClusters:
+      - dev01
+    deduplicationEnabled: true
+---
+apiVersion: neuron.isf/v1alpha1
+kind: NeuronNamespace
+metadata:
+  name: exchange-rate
+spec:
+  tenant: rbi         # The tenant the namespace belongs to
+  namespace: exchange-rate
+  neuronClusterName: dev01
+  lifecyclePolicy: CleanUpAfterDeletion

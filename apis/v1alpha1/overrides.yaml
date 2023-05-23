@@ -1,0 +1,68 @@
+# Overrides that are applied on a definition with the same
+# name below. This happens after $refs are resolved (external
+# only!).
+# This is only used in model generation.
+#
+# This is used to set the API uri available to mutate each field
+# with the Pulsar API along with its HTTP method, defaulting to
+# POST as that is most common.
+# If no uri is specified a uri will be automatically constructed
+# by converting the field into camelCase, so it's only needed to
+# manually set uris where this pattern does not fit.
+#
+# schema_validation_enforced -> /schemaValidationEnforced
+# deduplicationEnabled       -> /deduplicationEnabled
+#
+# Fields can also be set as immutable to indicate that there is
+# no endpoint to change that value and it can only be set during
+# initial resource creation.
+#
+# This whole extra work is only needed when dealing with namespaces
+# and topics.
+overrides:
+  NamespacePolicies:
+    properties:
+      # Immutable fields
+      auth_policies:
+        immutable: true
+      backlog_quota_map:
+        immutable: true
+      bundles:
+        immutable: true
+      # URI override
+      autoSubscriptionCreationOverride:
+        uri: /autoSubscriptionCreation
+      autoTopicCreationOverride:
+        uri: /autoTopicCreation
+      clusterDispatchRate:
+        uri: /dispatchRate
+      clusterSubscribeRate:
+        uri: /subscribeRate
+      deduplicationSnapshotIntervalSeconds:
+        uri: /deduplicationSnapshotInterval
+      delayed_delivery_policies:
+        uri: /delayedDelivery
+      retention_policies:
+        uri: /retention
+      replication_clusters:
+        uri: /replication
+      deduplicationEnabled:
+        uri: /deduplication
+      # Method override
+      schema_compatibility_strategy:
+        method: PUT
+      schema_auto_update_compatibility_strategy:
+        method: PUT
+      compaction_threshold:
+        method: PUT
+      offload_deletion_lag_ms:
+        method: PUT
+      offload_threshold:
+        method: PUT
+      properties:
+        method: PUT
+
+  TopicPolicies:
+    properties:
+      retention_policies:
+        uri: /retention

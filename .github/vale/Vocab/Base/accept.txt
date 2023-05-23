@@ -1,0 +1,15 @@
+Cortex
+Neuron
+Pulsar
+Avro
+[Nn]amespace
+snake_case
+camelCase
+CRD
+API
+YAML
+JSON
+pydantic
+URI
+mixin
+brewity

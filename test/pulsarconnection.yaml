@@ -1,0 +1,7 @@
+apiVersion: neuron.isf/v1alpha1
+kind: NeuronConnection
+metadata:
+  name: dev01
+spec:
+  service: dev01-proxy-headless
+  namespace: dev01-pulsar

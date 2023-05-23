@@ -1,0 +1,28 @@
+name: CI
+on:
+  push:
+    branches:
+      - feature/**
+      - main
+    paths:
+      - '**/*.py'
+      - '**/requirements.txt'
+      - 'Dockerfile' 
+env:
+  CARGO_TERM_COLOR: always
+jobs:
+  ci:
+    uses: raiffeisen/innersource-github-templates/.github/workflows/goldenpath-build-push-container-image.yaml@main
+    with:
+      imageName: "neuron-operator"
+      imageVersion: "0.0.8"
+      buildContext: "."
+      containerFiles: "./Dockerfile"
+      buildArgs: ""
+      pushImageToArtifactory: true
+      imageRegistry: "cortex-docker-host.artifacts.rbi.tech"
+      imageNamespace: ""
+    secrets:
+      CONTAINER_REGISTRY_USER: ${{ secrets.CONTAINER_REGISTRY_USER }}
+      CONTAINER_REGISTRY_TOKEN: ${{ secrets.CONTAINER_REGISTRY_TOKEN }}
+    if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}

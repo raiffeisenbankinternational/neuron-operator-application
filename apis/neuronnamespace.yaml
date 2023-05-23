@@ -1,0 +1,13 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: neuronnamespaces.neuron.isf
+spec:
+  group: neuron.isf
+  names:
+    kind: NeuronNamespace
+    plural: neuronnamespaces
+    singular: neuronnamespace
+  scope: Namespaced
+  versions:
+  - $ref: v1alpha1/neuronnamespace.yaml#/version

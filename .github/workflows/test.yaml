@@ -1,0 +1,31 @@
+name: Python testing
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Setup python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Install pytest
+      run: |
+        pip install -r requirements.txt
+        pip install -r dev-requirements.txt
+        pip install pytest-github-actions-annotate-failures pytest-md-report
+
+    - name: Run pytest
+      shell: bash
+      run: |
+        pytest --md-report --md-report-output=report.md --md-report-color=never
+        echo "# Test results" >> $GITHUB_STEP_SUMMARY
+        cat report.md >> $GITHUB_STEP_SUMMARY

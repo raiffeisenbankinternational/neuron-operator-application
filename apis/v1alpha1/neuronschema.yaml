@@ -1,0 +1,99 @@
+##################
+## VERSION ROOT ##
+##################
+version:
+  name: v1alpha1
+  additionalPrinterColumns:
+    - name: Phase
+      type: string
+      jsonPath: .status.phase
+    - name: Tenant
+      type: string
+      jsonPath: .spec.tenant
+    - name: Namespace
+      type: string
+      jsonPath: .spec.namespace
+    - name: Age
+      type: date
+      jsonPath: .metadata.creationTimestamp
+  subresources:
+    status: {}
+  schema:
+    openAPIV3Schema:
+      type: object
+      required:
+        - spec
+      properties:
+        spec:
+          $ref: '#/definitions/SchemaSpec'
+        status:
+          $ref: 'common.yaml#/definitions/Status'
+
+definitions:
+  ##########
+  ## SPEC ##
+  ##########
+  SchemaSpec:
+    type: object
+    required:
+    - tenant
+    - namespace
+    - topic
+    - schema
+    properties:
+      tenant:
+        description: Name of the tenant the topic belongs to
+        type: string
+      namespace:
+        description: Name of the namespace the topic belongs to
+        type: string
+      topic:
+        description: Name of the topic the schema should belong to
+        type: string
+      neuronClusterName:
+        $ref: 'common.yaml#/definitions/NeuronClusterName'
+      lifecyclePolicy:
+        $ref: 'common.yaml#/definitions/LifecyclePolicy'
+      type:
+        default: AVRO
+        description: The schema serialization type
+        enum:
+        - AVRO
+        - JSON
+        type: string
+      schema:
+        description: The schema definition
+        type: object
+        required:
+          - name
+          - type
+          - fields
+        properties:
+          name:
+            description: Name of the schema
+            type: string
+          type:
+            description: Schema type (currently only record is supported)
+            type: string
+            enum:
+              - record
+          doc:
+            description: Description to add to the schema
+            type: string
+          namespace:
+            description: Namespace of the schema
+            type: string
+          # free-form fields because in avro schema because `type` in a field
+          # can be a string or a list of strings and I have not been able to
+          # represent this in a way that kubernetes likes to accept
+          fields:
+            description: List of fields in the schema
+            type: array
+            items:
+              type: object
+              x-kubernetes-preserve-unknown-fields: true
+      properties:
+        description: Extra properties to add to schema
+        type: object
+        additionalProperties:
+          x-kubernetes-preserve-unknown-fields: true

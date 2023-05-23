@@ -1,0 +1,41 @@
+---
+apiVersion: neuron.isf/v1alpha1
+kind: NeuronTopic
+metadata:
+  name: neuron-demo-transaction-v1
+spec:
+  tenant: rbi
+  namespace: transaction
+  topic: neuron-demo-transaction-v1
+  neuronClusterName: dev01
+  lifecyclePolicy: CleanUpAfterDeletion
+  partitions: 16
+  rolePermissions:
+    MY-APP-ROLE:
+      - consume
+      - produce
+      - functions
+---
+apiVersion: neuron.isf/v1alpha1
+kind: NeuronTopic
+metadata:
+  name: neuron-demo-transaction-json-v1
+  annotations:
+    neuron.rbi.tech/cluster: dev01
+spec:
+  tenant: rbi
+  namespace: transaction
+  topic: neuron-demo-transaction-json-v1
+  lifecyclePolicy: CleanUpAfterDeletion
+  partitions: 16
+---
+apiVersion: neuron.isf/v1alpha1
+kind: NeuronTopic
+metadata:
+  name: neuron-demo-exchange-rate-v1
+spec:
+  tenant: rbi
+  namespace: exchange-rate
+  neuronClusterName: dev01
+  topic: neuron-demo-exchange-rate-v1
+  lifecyclePolicy: CleanUpAfterDeletion

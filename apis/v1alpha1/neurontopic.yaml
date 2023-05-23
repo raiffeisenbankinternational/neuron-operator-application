@@ -1,0 +1,72 @@
+##################
+## VERSION ROOT ##
+##################
+version:
+  name: v1alpha1
+  additionalPrinterColumns:
+    - name: Phase
+      type: string
+      jsonPath: .status.phase
+    - name: Tenant
+      type: string
+      jsonPath: .spec.tenant
+    - name: Namespace
+      type: string
+      jsonPath: .spec.namespace
+    - name: Age
+      type: date
+      jsonPath: .metadata.creationTimestamp
+  subresources:
+    status: {}
+  schema:
+    openAPIV3Schema:
+      type: object
+      required:
+        - spec
+      properties:
+        spec:
+          $ref: '#/definitions/TopicSpec'
+        status:
+          $ref: 'common.yaml#/definitions/Status'
+
+definitions:
+  ##########
+  ## SPEC ##
+  ##########
+  TopicSpec:
+    type: object
+    required:
+    - tenant
+    - namespace
+    - topic
+    properties:
+      tenant:
+        description: Name of the tenant the topic belongs to
+        type: string
+      namespace:
+        description: Name of the namespace the topic belongs to
+        type: string
+      topic:
+        description: Name of the topic that should be created under the namespace and tenant
+        type: string
+      neuronClusterName:
+        $ref: 'common.yaml#/definitions/NeuronClusterName'
+      lifecyclePolicy:
+        $ref: 'common.yaml#/definitions/LifecyclePolicy'
+      persistent:
+        default: true
+        description: Set persistence for the topic
+        type: boolean
+      partitions:
+        default: 0
+        description: Number of partitions for the topic
+        type: integer
+      rolePermissions:
+        description: Sets permissions for individual roles on the topic
+        type: object
+        additionalProperties:
+          type: array
+          items:
+            $ref: 'common.yaml#/definitions/RolePermissionEnum'
+      policies:
+        $ref: 'common.yaml#/definitions/TopicPolicies'

@@ -1,0 +1,110 @@
+definitions:
+  NeuronClusterName:
+    description: The name of the Neuron cluster the resource should be deployed to.
+    type: string
+
+  LifecyclePolicy:
+    default: KeepAfterDeletion
+    description: The lifecycle policy to use for the resource
+    enum:
+    - KeepAfterDeletion
+    - CleanUpAfterDeletion
+    type: string
+
+  StatusCondition:
+    type: object
+    required:
+    - type
+    - status
+    properties:
+      reason:
+        description: Reason for a failed status check
+        type: string
+      status:
+        description: Status of condition check
+        type: string
+      type:
+        description: Type of condition check
+        type: string
+      message:
+        description: Message for a failed status check
+        type: string
+
+  Status:
+    type: object
+    required:
+    - phase
+    properties:
+      conditions:
+        default: []
+        description: List of condition checks
+        items:
+          $ref: '#/definitions/StatusCondition'
+        type: array
+      observedGeneration:
+        description: Last observed generation of resource
+        type: integer
+      connectionURL:
+        description: URL from the NeuronConnection referenced by ConnectionRef
+        type: string
+      phase:
+        description: The phase of the resource
+        type: string
+
+  # Settings for a tenant, can be referenced directly
+  TenantSettings:
+    # Instructs our script to resolve this ref before
+    # passing it to the code generator
+    resolve: true
+    $ref: '2.9.2.json#/definitions/TenantInfo'
+
+  # Policies for namespace, will be patched with fields
+  # above in Pulsar API auto-generated models
+  NamespacePolicies:
+    # Instructs our script to resolve this ref before
+    # passing it to the code generator
+    resolve: true
+    $ref: '2.9.2.json#/definitions/Policies'
+
+  # Since the Pulsar API doesn't support creating a topic
+  # with all policies specified, instead having to create
+  # a topic and then individually set each policy, no such
+  # policy object exists for topics in the swagger definition.
+  # So instead we need to build it up manually but can
+  # reference nested objects from swagger where appropriate.
+  TopicPolicies:
+    type: object
+    description: Policies for the topic
+    properties:
+      deduplicationEnabled:
+        resolve: true
+        $ref: '2.9.2.json#/definitions/Policies/properties/deduplicationEnabled'
+      max_consumers_per_topic:
+        resolve: true
+        $ref: '2.9.2.json#/definitions/Policies/properties/max_consumers_per_topic'
+      max_producers_per_topic:
+        resolve: true
+        $ref: '2.9.2.json#/definitions/Policies/properties/max_producers_per_topic'
+      max_subscriptions_per_topic:
+        resolve: true
+        $ref: '2.9.2.json#/definitions/Policies/properties/max_subscriptions_per_topic'
+      message_ttl_in_seconds:
+        resolve: true
+        $ref: '2.9.2.json#/definitions/Policies/properties/message_ttl_in_seconds'
+      inactive_topic_policies:
+        $ref: '2.9.2.json#/definitions/InactiveTopicPolicies'
+      retention_policies:
+        $ref: '2.9.2.json#/definitions/RetentionPolicies'
+      persistence:
+        $ref: '2.9.2.json#/definitions/PersistencePolicies'
+
+  RolePermissionEnum:
+    type: string
+    enum:
+      - produce
+      - consume
+      - functions
+      - sources
+      - sinks
+      - packages
+

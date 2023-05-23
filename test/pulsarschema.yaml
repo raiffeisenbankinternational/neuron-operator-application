@@ -1,0 +1,79 @@
+---
+apiVersion: neuron.isf/v1alpha1
+kind: NeuronSchema
+metadata:
+  name: neuron-demo-transaction-v1
+spec:
+  tenant: rbi
+  namespace: transaction
+  topic: neuron-demo-transaction-v1
+  neuronClusterName: dev01
+  lifecyclePolicy: CleanUpAfterDeletion
+  type: AVRO
+  schema:
+    name: NeuronDemoTransaction
+    type: record
+    fields:
+      - name: bic
+        type: string
+      - name: countryOfBirth
+        type: string
+      - name: customerId
+        type: string
+      - name: dateOfBirth
+        type: string
+      - name: dateOfOpened
+        type: string
+      - name: firstName
+        type: string
+      - name: lastName
+        type: string
+      - name: lineOfBusiness
+        type: string
+      - name: placeOfBirth
+        type: string
+      - name: title
+        type:
+          - 'null'
+          - string
+---
+apiVersion: neuron.isf/v1alpha1
+kind: NeuronSchema
+metadata:
+  name: neuron-demo-transaction-json-v1
+spec:
+  tenant: rbi
+  namespace: transaction
+  topic: neuron-demo-transaction-json-v1
+  neuronClusterName: dev01
+  lifecyclePolicy: CleanUpAfterDeletion
+  type: JSON
+  schema:
+    name: NeuronDemoTransaction
+    type: record
+    fields:
+      - name: bic
+        type: string
+      - name: countryOfBirth
+        type: string
+      - name: customerId
+        type: string
+      - name: dateOfBirth
+        type: string
+      - name: dateOfOpened
+        type: string
+      - name: firstName
+        type: string
+      - name: lastName
+        type: string
+      - name: lineOfBusiness
+        type: string
+      - name: placeOfBirth
+        type: string
+      - name: title
+        type:
+          - 'null'
+          - string
+  properties:
+    owner: me
+    something: else

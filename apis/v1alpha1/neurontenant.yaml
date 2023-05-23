@@ -1,0 +1,43 @@
+##################
+## VERSION ROOT ##
+##################
+version:
+  name: v1alpha1
+  additionalPrinterColumns:
+    - name: Phase
+      type: string
+      jsonPath: .status.phase
+    - name: Age
+      type: date
+      jsonPath: .metadata.creationTimestamp
+  subresources:
+    status: {}
+  schema:
+    openAPIV3Schema:
+      type: object
+      required:
+        - spec
+      properties:
+        spec:
+          $ref: '#/definitions/TenantSpec'
+        status:
+          $ref: 'common.yaml#/definitions/Status'
+
+definitions:
+  ##########
+  ## SPEC ##
+  ##########
+  TenantSpec:
+    type: object
+    required:
+      - tenant
+    properties:
+      tenant:
+        description: Name of the tenant
+        type: string
+      neuronClusterName:
+        $ref: 'common.yaml#/definitions/NeuronClusterName'
+      lifecyclePolicy:
+        $ref: 'common.yaml#/definitions/LifecyclePolicy'
+      settings:
+        $ref: 'common.yaml#/definitions/TenantSettings'
